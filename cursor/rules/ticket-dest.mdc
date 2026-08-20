@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+接口按照以下约定：
+1.GET /healthz
+正常可以返回 {"ok": true, "db": "up"}。如果数据库没连上，返回 503，并且 "db": "down"。
+2.POST /tickets
+示例：{"title":"修登录页","assignee":"intern","priority":"high"}
+title 必填，1～80 字
+assignee 必填
+priority 用 low / medium / high，不传就当 medium
+成功返回 201，带上服务端生成的 id、status、created_at。新工单的 status 用 open。
+3.GET /tickets
+可以支持 ?status=open、?assignee=intern。返回数组，按 created_at 新的排前面。
+4.GET /tickets/{id}
+找不到的话 404，{"error":"ticket_not_found"} 。
+5.POST /tickets/{id}/done
+把 open 改成 done。已经是 done 的话再点一次返回 409，{"error":"already_done"}。
+6.POST /tickets/{id}/notes
+Body：{"body":"复现了，准备改"}，body 1～500 字。工单不存在就 404。
+7.参数不对返回400，{"error":"wrong_parameter"}
+8.密码不要放进仓库。可以用 .env.example + .env，并把 .env 加进 .gitignore
+9.Dockerfile用Linux基础镜像
